@@ -1,14 +1,18 @@
-# Umi Bot (Foundation + Core Loop v0)
+# Umi Bot (Foundation + Core Loop v1)
 
 ## Đã triển khai
 - Nền tảng kỹ thuật: config validation, logger, MySQL pool, transaction manager.
 - Anti-abuse primitives: rate limiter, idempotency command pipeline.
 - Core schema migrations: users, wallets, transactions, profiles, inventories, inventory_items, cooldowns.
-- Prefix command đầu tiên (`umi...`):
+- Prefix command đã chạy:
   - `umicash` / `umibalance`
   - `umihunt`
   - `umifish`
-- Auto bootstrap state người chơi mới khi chạy lệnh lần đầu.
+  - `umiinventory` / `umiinv`
+  - `umisell <item_code> <qty>`
+  - `umisell all-common`
+  - `umihelp`
+- Auto bootstrap state người chơi mới khi chạy lệnh đầu tiên.
 
 ## Chạy local
 1. `cp .env.example .env`
@@ -24,5 +28,6 @@
 ## Nguyên tắc an toàn đang áp dụng
 - Mọi mutate flow đi qua transaction.
 - Ví được lock `FOR UPDATE` trước khi cập nhật số dư.
+- Lệnh bán cấm với item lock/equipped/quest.
 - Command có idempotency key chống double submit.
-- Có kiểm thử tự động cho rate-limit/idempotency.
+- Có kiểm thử tự động cho rate-limit/idempotency/parser/domain.

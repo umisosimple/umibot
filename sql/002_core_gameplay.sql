@@ -1,0 +1,47 @@
+CREATE TABLE IF NOT EXISTS profiles (
+  user_id BIGINT UNSIGNED PRIMARY KEY,
+  level INT NOT NULL DEFAULT 1,
+  exp BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  created_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3),
+  CONSTRAINT fk_profile_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS inventories (
+  inventory_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL UNIQUE,
+  version BIGINT UNSIGNED NOT NULL DEFAULT 1,
+  created_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3),
+  CONSTRAINT fk_inventory_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS inventory_items (
+  item_row_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  inventory_id BIGINT UNSIGNED NOT NULL,
+  item_code VARCHAR(64) NOT NULL,
+  qty INT UNSIGNED NOT NULL,
+  is_locked TINYINT(1) NOT NULL DEFAULT 0,
+  is_equipped TINYINT(1) NOT NULL DEFAULT 0,
+  is_quest_item TINYINT(1) NOT NULL DEFAULT 0,
+  created_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3),
+  CONSTRAINT fk_inv_item_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(inventory_id),
+  UNIQUE KEY uq_inventory_item (inventory_id, item_code)
+);
+
+CREATE TABLE IF NOT EXISTS idempotency_records (
+  idem_key VARCHAR(128) PRIMARY KEY,
+  response_json JSON NOT NULL,
+  expires_at DATETIME(3) NOT NULL,
+  created_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3)
+);
+
+CREATE TABLE IF NOT EXISTS cooldowns (
+  user_id BIGINT UNSIGNED NOT NULL,
+  command_key VARCHAR(64) NOT NULL,
+  expires_at DATETIME(3) NOT NULL,
+  created_at DATETIME(3) NOT NULL DEFAULT UTC_TIMESTAMP(3),
+  PRIMARY KEY (user_id, command_key),
+  CONSTRAINT fk_cooldown_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
